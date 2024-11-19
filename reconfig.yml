@@ -1,0 +1,56 @@
+---
+# Arch Linux Reconfiguration Manager Configuration
+
+# System packages (installed via pacman)
+system:
+  # Base system utilities
+  base:
+    - base-devel
+    - git
+    - vim
+    - yq
+    
+  # Development tools
+  development:
+    - docker
+    - docker-compose
+    - visual-studio-code-bin
+    
+  # Desktop environment
+  desktop:
+    - plasma-desktop
+    - plasma-wayland-session
+    - dolphin
+    - konsole
+
+# AUR packages (installed via yay/paru)
+aur:
+  # Development tools
+  development:
+    - postman-bin
+    
+  # Themes and customization
+  themes:
+    - kvantum-theme-materia
+    - materia-kde-theme
+
+# KDE Themes configuration
+themes:
+  global:
+    - name: "Materia Dark"
+      url: "https://store.kde.org/p/1229134"
+  
+  kvantum:
+    - name: "MateriaDark"
+      url: "https://store.kde.org/p/1229134"
+
+# Additional configurations
+fonts:
+  - noto-fonts
+  - ttf-dejavu
+  - ttf-liberation
+
+# Custom scripts to run after setup
+scripts:
+  - path: "scripts/kde_config.sh"
+    description: "Configure KDE theme settings"
