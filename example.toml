@@ -1,0 +1,52 @@
+# Example Rekonfig Configuration File
+
+[system]
+shell = "zsh"
+desktop_environment = "plasma"
+terminal = "konsole"
+terminal_font = "Fira Code"
+icons = "Papirus-Dark"
+theme = "Breeze-Dark"
+splash_screen = "Breeze"
+login_screen = "SDDM"
+
+[locale]
+language = "en_US.UTF-8"
+timezone = "UTC"
+keyboard_layout = "us"
+
+[packages]
+system = [
+    "base",
+    "linux",
+    "nano",
+    "vim",
+    "git",
+    "base-devel"
+]
+
+development = [
+    "neovim",
+    "docker",
+    "docker-compose",
+    "rust",
+    "go",
+    "python"
+]
+
+graphics = [
+    "gimp",
+    "inkscape",
+    "krita"
+]
+
+[themes]
+kvantum = "Sweet"
+global = "Breeze-Dark"
+
+# KDE Plasma widgets
+widgets = [
+    "Event Calendar",
+    "System Monitor",
+    "Weather Report"
+]

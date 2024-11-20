@@ -1,149 +1,144 @@
-# Arch Linux Reconfiguration Manager
+# Rekonfig
 
-A modular and extensible solution for automating the configuration of Arch Linux systems. This tool helps you maintain a consistent, reproducible system setup through a centralized YAML configuration file.
+A lightweight, extensible tool for automating and replicating Arch Linux system configurations. Rekonfig helps you maintain consistent environments across multiple machines by detecting and applying system settings, packages, and themes.
 
 ## Features
 
+- 🔍 **System Detection**
+  - Automatically detects current shell, desktop environment, and terminal
+  - Identifies installed packages and categorizes them
+  - Captures locale settings and system preferences
+
 - 📦 **Package Management**
-  - System package installation via `pacman`
-  - AUR package installation via `yay`
-  - Package validation before installation
-  - Easy package addition with category management
+  - Manages both system (pacman) and AUR packages
+  - Intelligent package categorization
+  - Validates package existence before installation
 
 - 🎨 **Theme Management**
-  - KDE Global theme installation and configuration
+  - KDE Plasma theme configuration
   - Kvantum theme support
-  - Automated theme downloads and application
+  - Global theme application
 
-- 🛠️ **System Configuration**
-  - Centralized configuration through `reconfig.yml`
-  - Font package installation
-  - Custom script execution support
-  - Comprehensive logging
-
+- ⚙️ **System Configuration**
+  - Shell configuration
+  - Locale and timezone settings
+  - Keyboard layout preferences
 
 ## Prerequisites
 
-- Arch Linux
-- `sudo` access
-- Basic dependencies:
+- Arch Linux or compatible distribution
+- Rust toolchain (for building)
+- Base development tools:
   ```bash
-  sudo pacman -S yq curl base-devel git
+  sudo pacman -S base-devel git rust
   ```
 
 ## Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/arch-reconfig-manager
-   cd arch-reconfig-manager
+   git clone https://github.com/yourusername/rekonfig
+   cd rekonfig
    ```
 
-2. Make scripts executable:
+2. Build the project:
    ```bash
-   chmod +x scripts/*.sh
+   cargo build --release
    ```
 
-## Configuration
-
-The system is configured through `reconfig.yml`. Here's an example configuration:
-
-```yaml
-# System packages (installed via pacman)
-system:
-  base:
-    - base-devel
-    - git
-    - vim
-    - yq
-  
-  development:
-    - docker
-    - docker-compose
-    - visual-studio-code-bin
-
-# AUR packages
-aur:
-  development:
-    - postman-bin
-  
-  themes:
-    - kvantum-theme-materia
-
-# KDE Themes
-themes:
-  global:
-    - name: "Materia Dark"
-      url: "https://store.kde.org/p/1229134"
-  
-  kvantum:
-    - name: "MateriaDark"
-      url: "https://store.kde.org/p/1229134"
-
-# Font packages
-fonts:
-  - noto-fonts
-  - ttf-dejavu
-  - ttf-liberation
-```
+3. Install the binary (optional):
+   ```bash
+   sudo install -Dm755 target/release/rekonfig /usr/local/bin/rekonfig
+   ```
 
 ## Usage
 
-### Full System Setup
+### Initialize Configuration
 
-To apply your entire configuration:
-
-```bash
-sudo ./scripts/setup.sh
-```
-
-This will:
-1. Install all configured packages
-2. Apply KDE themes (if configured)
-3. Install fonts
-4. Execute any custom scripts
-
-### Adding Packages
-
-To add a new package:
+Detect current system settings and create a configuration file:
 
 ```bash
-./scripts/add_package.sh <package-name> [section]
+rekonfig init [--hard]
 ```
 
-Available sections:
-- `system.base` - Base system utilities
-- `system.development` - Development tools
-- `system.desktop` - Desktop environment packages
-- `aur.development` - AUR development tools
-- `aur.themes` - AUR themes and customization
-- `fonts` - Font packages
+The `--hard` flag includes all installed packages, including dependencies.
 
-Example:
+### Apply Configuration
+
+Apply settings from a configuration file:
+
 ```bash
-./scripts/add_package.sh neovim system.development
+rekonfig config.toml
 ```
 
-## Directory Structure
+Apply specific sections only:
+
+```bash
+rekonfig config.toml -s system    # Apply only system settings
+rekonfig config.toml -s packages  # Install only packages
+rekonfig config.toml -s themes    # Configure only themes
+```
+
+### Add Packages
+
+Add a new package to the configuration:
+
+```bash
+rekonfig add-package pacman neovim development  # Add a pacman package
+rekonfig add-package yay paru-bin system        # Add an AUR package
+```
+
+## Configuration File
+
+Rekonfig uses TOML for configuration. Here's an example `config.toml`:
+
+```toml
+[system]
+shell = "zsh"
+desktop_environment = "plasma"
+terminal = "konsole"
+terminal_font = "Fira Code"
+icons = "Papirus-Dark"
+theme = "Breeze-Dark"
+splash_screen = "Breeze"
+login_screen = "SDDM"
+
+[locale]
+language = "en_US.UTF-8"
+timezone = "UTC"
+keyboard_layout = "us"
+
+[packages]
+system = ["base", "linux", "nano"]
+development = ["git", "neovim", "docker"]
+graphics = ["gimp", "inkscape"]
+
+[themes]
+kvantum = "Sweet"
+global = "Breeze-Dark"
+
+[widgets]
+- "Event Calendar"
+- "Notes"
+```
+
+## Project Structure
 
 ```
 .
-├── reconfig.yml        # Main configuration file
-├── scripts/
-│   ├── setup.sh        # Main setup script
-│   ├── add_package.sh  # Package addition utility
-│   ├── kde_config.sh   # KDE theme configuration
-│   └── install_packages.sh  # Package installation
-└── logs/
-    └── setup.log       # Setup and error logs
+├── Cargo.toml              # Project manifest
+├── src/
+│   ├── main.rs            # Entry point and CLI
+│   ├── commands/          # Command implementations
+│   │   ├── init.rs        # System detection
+│   │   ├── apply.rs       # Configuration application
+│   │   └── add_package.rs # Package management
+│   ├── config/            # Configuration structures
+│   │   └── mod.rs         # TOML configuration
+│   ├── system/            # System interaction
+│   │   └── mod.rs         # System detection functions
+│   └── utils/             # Utility functions
 ```
-
-## Error Handling
-
-- All operations are logged to `logs/setup.log`
-- Failed operations are clearly marked in the log
-- The system will continue with the next item on failure when possible
-- Critical failures will stop the process and provide clear error messages
 
 ## Contributing
 
@@ -157,24 +152,20 @@ Example:
 
 ### Common Issues
 
-1. **Package Not Found**
-   - Verify the package name exists in pacman or AUR
-   - Check your internet connection
-   - Update package databases: `sudo pacman -Sy`
+1. **Package Installation Fails**
+   - Check internet connection
+   - Verify package exists in repositories
+   - Run `sudo pacman -Syu` to update system
 
-2. **Theme Installation Fails**
-   - Verify the theme URL is accessible
-   - Ensure KDE/Kvantum is properly installed
-   - Check the theme format is correct
+2. **Theme Application Fails**
+   - Ensure KDE/Kvantum is installed
+   - Verify theme package names
+   - Check theme file permissions
 
-3. **Permission Issues**
-   - Ensure scripts are executable
-   - Run setup.sh with sudo
-   - Check file permissions in ~/.local
-
-### Logs
-
-Check `logs/setup.log` for detailed error messages and operation history.
+3. **System Detection Issues**
+   - Verify required tools are installed
+   - Check environment variables
+   - Run with elevated privileges if needed
 
 ## Support
 
